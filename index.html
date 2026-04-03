@@ -6,10 +6,10 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #141e30, #243b55);
+      font-family: Arial, sans-serif;
       color: white;
       text-align: center;
+      background: linear-gradient(135deg, #141e30, #243b55);
     }
 
     h1 {
@@ -30,8 +30,9 @@
       backdrop-filter: blur(10px);
       border-radius: 15px;
       padding: 20px;
-      width: 280px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      max-width: 300px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       transition: 0.3s;
     }
 
@@ -59,38 +60,40 @@
 
 <body>
 
-<h1>🔥 The Great Quote Wall</h1>
+  <h1>🔥 The Great Quote Wall</h1>
 
-<div id="quotes"></div>
+  <div id="quotes"></div>
 
-<script>
-fetch("https://opensheet.elk.sh/1IsFf9Q8tNUafJ946L3SLaJGHAFjBORSBJuXNFxz_8/formResponses1")
-.then(response => response.json())
-.then(data => {
+  <script>
+    fetch("https://opensheet.elk.sh/YOUR_SHEET_ID/Sheet1")
+      .then(response => response.json())
+      .then(data => {
 
-  const container = document.getElementById("quotes");
+        const container = document.getElementById("quotes");
 
-  data.forEach(item => {
+        data.forEach(item => {
 
-    if(item.Status === "Approved") {
+          // TEMP: show all quotes (remove filter issue)
+          // Change later if needed
+          if (true) {
 
-      const div = document.createElement("div");
-      div.className = "quote";
+            const div = document.createElement("div");
+            div.className = "quote";
 
-      div.innerHTML = `
-        <h2>"${item["Enter your quote (max 25 words)"]}"</h2>
-        <p>- ${item["Your Name"]}</p>
-        <p class="category">${item["Category"]}</p>
-      `;
+            div.innerHTML = `
+              <h2>${item["Enter your quote (max 25 words)"] || "No Quote"}</h2>
+              <p>- ${item["Your Name"] || "Anonymous"}</p>
+              <p class="category">${item["Category"] || ""}</p>
+            `;
 
-      container.appendChild(div);
-    }
+            container.appendChild(div);
+          }
 
-  });
+        });
 
-})
-.catch(error => console.error(error));
-</script>
+      })
+      .catch(error => console.error("Error loading data:", error));
+  </script>
 
 </body>
 </html>
