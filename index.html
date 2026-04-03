@@ -5,25 +5,54 @@
 
   <style>
     body {
-      background: #0f0f0f;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      color: white;
+      text-align: center;
     }
 
     h1 {
-      margin-top: 20px;
+      padding: 20px;
+      font-size: 28px;
+    }
+
+    #quotes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
     }
 
     .quote {
-      margin: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
       padding: 20px;
-      border: 1px solid #444;
-      border-radius: 10px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+      width: 280px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      transition: 0.3s;
+    }
+
+    .quote:hover {
+      transform: scale(1.05);
+    }
+
+    .quote h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .quote p {
+      margin: 5px 0;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .category {
+      font-size: 12px;
+      color: #00d4ff;
     }
   </style>
 </head>
@@ -35,8 +64,7 @@
 <div id="quotes"></div>
 
 <script>
-
-fetch("https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/Form%20responses%201")
+fetch("https://opensheet.elk.sh/1IsFf9Q8tNUafJ946L3SLaJGHAFjBORSBJuXNFxz_8/formResponses1")
 .then(response => response.json())
 .then(data => {
 
@@ -44,7 +72,7 @@ fetch("https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/For
 
   data.forEach(item => {
 
-    if(item["Status"] === "Approved") {
+    if(item.Status === "Approved") {
 
       const div = document.createElement("div");
       div.className = "quote";
@@ -52,7 +80,7 @@ fetch("https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/For
       div.innerHTML = `
         <h2>"${item["Enter your quote (max 25 words)"]}"</h2>
         <p>- ${item["Your Name"]}</p>
-        <small>${item["Category"]}</small>
+        <p class="category">${item["Category"]}</p>
       `;
 
       container.appendChild(div);
@@ -62,7 +90,6 @@ fetch("https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/For
 
 })
 .catch(error => console.error(error));
-
 </script>
 
 </body>
