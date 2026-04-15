@@ -18,7 +18,7 @@
     }
 
     .submit-btn {
-      margin-top: 10px;
+      margin-top: 15px;
       padding: 10px 20px;
       border: none;
       border-radius: 10px;
@@ -37,20 +37,11 @@
     }
 
     .quote {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 15px;
       padding: 20px;
       width: 300px;
-      transition: 0.3s;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    }
-
-    .quote:hover {
-      transform: scale(1.05);
-    }
-
-    small {
-      color: #00d4ff;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
 
     .like-btn {
@@ -79,8 +70,10 @@
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwI__k7hVY2RQz_3b0LLuKnILLASwhwCluIv0j2DyDhyEVUo9W-MmKQ_hYdfvirO94/exec";
 
-fetch("https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/Form%20responses%201")
-.then(response => response.json())
+const SHEET_URL = "https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/Form%20responses%201";
+
+fetch(SHEET_URL)
+.then(res => res.json())
 .then(data => {
 
   const container = document.getElementById("quotes");
@@ -88,22 +81,24 @@ fetch("https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/For
 
   data.forEach((item, index) => {
 
-    const quoteText = item["Enter your quote (max 25 words)"];
+    const quote = item["Enter your quote (max 25 words)"];
     const name = item["Your Name"];
     const category = item["Category"];
     const likes = item["Likes"] || 0;
 
-    if(!quoteText) return;
+    if (!quote) return;
+
+    const rowNumber = index + 2; // IMPORTANT
 
     const div = document.createElement("div");
     div.className = "quote";
 
     div.innerHTML = `
-      <h2>"${quoteText}"</h2>
+      <h2>"${quote}"</h2>
       <p>- ${name || "Anonymous"}</p>
       <small>${category || ""}</small>
       <br><br>
-      <button class="like-btn" onclick="likeQuote(${index + 2})">❤️ Like</button>
+      <button class="like-btn" onclick="likeQuote(${rowNumber})">❤️ Like</button>
       <p>${likes} Likes</p>
     `;
 
@@ -114,15 +109,18 @@ fetch("https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/For
 });
 
 function likeQuote(row) {
-
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify({ row: row })
   })
   .then(() => {
+    alert("Liked ❤️");
     location.reload();
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error liking quote");
   });
-
 }
 
 </script>
