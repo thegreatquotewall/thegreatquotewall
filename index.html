@@ -28,6 +28,13 @@
       cursor: pointer;
     }
 
+    input, select {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin: 5px;
+    }
+
     #quotes {
       display: flex;
       flex-wrap: wrap;
@@ -69,6 +76,17 @@
   <button class="submit-btn">Submit Your Quote</button>
 </a>
 
+<br><br>
+
+<input type="text" id="searchInput" placeholder="Search quotes..." onkeyup="filterQuotes()">
+
+<select id="categoryFilter" onchange="filterQuotes()">
+  <option value="All">All Categories</option>
+  <option value="Motivation">Motivation</option>
+  <option value="Love">Love</option>
+  <option value="Life">Life</option>
+</select>
+
 <div id="quotes"></div>
 
 <script>
@@ -77,10 +95,16 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwI__k7hVY2RQz_3b0LLuKn
 
 const SHEET_URL = "https://opensheet.elk.sh/1IsFf9908tNuAtJ946L35LaJGHA9Fb0RSBJzUNkFzx_8/Form%20responses%201";
 
+let allQuotes = [];
+
 fetch(SHEET_URL)
 .then(res => res.json())
 .then(data => {
+  allQuotes = data;
+  displayQuotes(data);
+});
 
+function displayQuotes(data) {
   const container = document.getElementById("quotes");
   container.innerHTML = "";
 
@@ -94,7 +118,6 @@ fetch(SHEET_URL)
     if (!quote) return;
 
     const rowNumber = index + 2;
-
     const alreadyLiked = localStorage.getItem("liked_" + rowNumber);
 
     const div = document.createElement("div");
@@ -114,16 +137,32 @@ fetch(SHEET_URL)
     `;
 
     container.appendChild(div);
+  });
+}
 
+function filterQuotes() {
+
+  const searchValue = document.getElementById("searchInput").value.toLowerCase();
+  const categoryValue = document.getElementById("categoryFilter").value;
+
+  const filtered = allQuotes.filter(item => {
+
+    const quote = item["Enter your quote (max 25 words)"]?.toLowerCase() || "";
+    const category = item["Category"] || "";
+
+    const matchSearch = quote.includes(searchValue);
+    const matchCategory = categoryValue === "All" || category === categoryValue;
+
+    return matchSearch && matchCategory;
   });
 
-});
+  displayQuotes(filtered);
+}
 
 function likeQuote(row, btn) {
 
-  // Prevent multiple likes
   if (localStorage.getItem("liked_" + row)) {
-    alert("You already liked this quote 👍");
+    alert("You already liked this 👍");
     return;
   }
 
@@ -133,22 +172,15 @@ function likeQuote(row, btn) {
   })
   .then(() => {
 
-    // Save in browser
     localStorage.setItem("liked_" + row, true);
 
-    // Update button instantly
     btn.innerText = "Liked ❤️";
     btn.classList.add("liked");
     btn.disabled = true;
 
-    // Reload to update count
     setTimeout(() => {
       location.reload();
     }, 500);
-
-  })
-  .catch(() => {
-    alert("Error liking quote");
   });
 }
 
