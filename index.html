@@ -105,6 +105,9 @@ let allQuotes = [];
 fetch(SHEET_URL)
 .then(res => res.json())
 .then(data => {
+  // Sort by likes (highest first)
+  data.sort((a, b) => (b["Likes"] || 0) - (a["Likes"] || 0));
+
   allQuotes = data;
   displayQuotes(data);
 });
