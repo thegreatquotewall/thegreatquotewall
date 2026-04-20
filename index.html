@@ -149,19 +149,18 @@ function displayQuotes(data) {
 }
 
 function filterQuotes() {
-
   const searchValue = document.getElementById("searchInput").value.toLowerCase();
-  const categoryValue = document.getElementById("categoryFilter").value;
+  const selectedCategory = document.getElementById("categoryFilter").value;
 
   const filtered = allQuotes.filter(item => {
-
-    const quote = item["Enter your quote (max 25 words)"]?.toLowerCase() || "";
+    const quote = (item["Enter your quote (max 25 words)"] || "").toLowerCase();
+    const name = (item["Your Name"] || "").toLowerCase();
     const category = item["Category"] || "";
 
-    const matchSearch = quote.includes(searchValue);
-    const matchCategory = categoryValue === "All" || category === categoryValue;
-
-    return matchSearch && matchCategory;
+    return (
+      (quote.includes(searchValue) || name.includes(searchValue)) &&
+      (selectedCategory === "All" || category === selectedCategory)
+    );
   });
 
   displayQuotes(filtered);
