@@ -4,106 +4,76 @@
   <title>The Great Quote Wall</title>
 
   <style>
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  color: white;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      color: white;
+      text-align: center;
+    }
 
-h1 {
-  text-align: center;
-  margin-top: 30px;
-  font-size: 32px;
-  letter-spacing: 1px;
-}
+    h1 {
+      margin-top: 30px;
+    }
 
-.top-bar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 20px;
-  text-align: center;
-}
+    .submit-container {
+      text-align: center;
+      margin-top: 15px;
+    }
 
-.submit-container {
-  text-align: center;
-  margin-top: 15px;
-}
+    .submit-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      background: #00d4ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-.submit-btn {
-  padding: 10px 20px;
-  border-radius: 25px;
-  border: none;
-  background: linear-gradient(45deg, #00d4ff, #00ffa6);
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 20px;
+    }
 
-.submit-btn:hover {
-  transform: scale(1.05);
-}
+    input, select {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
 
-input, select {
-  padding: 10px;
-  border-radius: 20px;
-  border: none;
-  margin: 5px;
-  outline: none;
-}
+    #quotes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
 
-#quotes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
-  padding: 30px;
-}
+    .quote {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 20px;
+      width: 300px;
+    }
 
-.quote {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 20px;
-  transition: 0.3s;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
+    .like-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      border-radius: 8px;
+      border: none;
+      background: #ff4d6d;
+      color: white;
+      cursor: pointer;
+    }
 
-.quote:hover {
-  transform: translateY(-8px);
-}
-
-.quote h2 {
-  font-size: 20px;
-}
-
-.quote p {
-  margin-top: 10px;
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-.like-btn {
-  margin-top: 10px;
-  padding: 8px 15px;
-  border-radius: 20px;
-  border: none;
-  background: linear-gradient(45deg, #ff4d6d, #ff758c);
-  color: white;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.like-btn:hover {
-  transform: scale(1.1);
-}
-
-.liked {
-  background: gray !important;
-  cursor: not-allowed;
-}
+    .liked {
+      background: gray !important;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 
@@ -111,15 +81,14 @@ input, select {
 
 <h1>The Great Quote Wall</h1>
 
-<a href="https://docs.google.com/forms/d/e/1FAIpQLScaFHGWChDKDjEWFNFUanL-EULR86040LQsjJoRNpirWLsvgg/viewform" target="_blank">
-  <button class="submit-btn">Submit Your Quote</button>
-</a>
-
-<br><br>
+<div class="submit-container">
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLScaFHGWChDKDjEWFNFUanL-EULR86040LQsjJoRNpirWLsvgg/viewform" target="_blank">
+    <button class="submit-btn">Submit Your Quote</button>
+  </a>
+</div>
 
 <div class="top-bar">
-
-  <input type="text" id="searchInput" placeholder="🔍 Search quotes..." onkeyup="filterQuotes()">
+  <input type="text" id="searchInput" placeholder="Search quotes..." onkeyup="filterQuotes()">
 
   <select id="categoryFilter" onchange="filterQuotes()">
     <option value="All">All Categories</option>
@@ -132,8 +101,9 @@ input, select {
     <option value="Pain">Pain</option>
     <option value="Wisdom">Wisdom</option>
   </select>
-
 </div>
+
+<div id="quotes"></div>
 
 <script>
 
@@ -146,7 +116,8 @@ let allQuotes = [];
 fetch(SHEET_URL)
 .then(res => res.json())
 .then(data => {
-  // Sort by likes (highest first)
+
+  // Sort by likes
   data.sort((a, b) => (b["Likes"] || 0) - (a["Likes"] || 0));
 
   allQuotes = data;
@@ -173,13 +144,13 @@ function displayQuotes(data) {
     div.className = "quote";
 
     div.innerHTML = `
-      <h2>"${quote}"</h2>
+      <h2>“${quote}”</h2>
       <p>- ${name || "Anonymous"}</p>
       <small>${category || ""}</small>
       <br><br>
       <button class="like-btn ${alreadyLiked ? 'liked' : ''}" 
-              onclick="likeQuote(${rowNumber}, this)" 
-              ${alreadyLiked ? 'disabled' : ''}>
+        onclick="likeQuote(${rowNumber}, this)" 
+        ${alreadyLiked ? 'disabled' : ''}>
         ${alreadyLiked ? 'Liked ❤️' : '❤️ Like'}
       </button>
       <p>${likes} Likes</p>
@@ -190,17 +161,19 @@ function displayQuotes(data) {
 }
 
 function filterQuotes() {
+
   const searchValue = document.getElementById("searchInput").value.toLowerCase();
-  const selectedCategory = document.getElementById("categoryFilter").value;
+  const categoryValue = document.getElementById("categoryFilter").value;
 
   const filtered = allQuotes.filter(item => {
+
     const quote = (item["Enter your quote (max 25 words)"] || "").toLowerCase();
     const name = (item["Your Name"] || "").toLowerCase();
     const category = item["Category"] || "";
 
     return (
       (quote.includes(searchValue) || name.includes(searchValue)) &&
-      (selectedCategory === "All" || category === selectedCategory)
+      (categoryValue === "All" || category === categoryValue)
     );
   });
 
