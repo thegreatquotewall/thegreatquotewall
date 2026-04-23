@@ -2,32 +2,39 @@
 <html>
 <head>
   <title>The Great Quote Wall</title>
+
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #1e3c72, #2a5298);
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: white;
       text-align: center;
     }
 
     h1 {
       margin-top: 30px;
+      font-size: 28px;
     }
 
     .subtitle {
-      margin-bottom: 20px;
       color: #ddd;
+      margin-bottom: 20px;
     }
 
     .submit-btn {
-      background: #00c6ff;
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
       border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
+      padding: 14px 24px;
+      border-radius: 10px;
       color: white;
       font-size: 16px;
       cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .submit-btn:hover {
+      transform: scale(1.05);
     }
 
     .search-box {
@@ -36,9 +43,10 @@
 
     input, select {
       padding: 10px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
       margin: 5px;
+      outline: none;
     }
 
     #quotes {
@@ -46,26 +54,43 @@
     }
 
     .quote {
+      backdrop-filter: blur(10px);
       background: rgba(255,255,255,0.1);
-      padding: 20px;
-      margin: 15px auto;
-      border-radius: 12px;
-      width: 80%;
-      max-width: 400px;
+      padding: 25px;
+      margin: 20px auto;
+      border-radius: 16px;
+      width: 85%;
+      max-width: 420px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+    }
+
+    .quote:hover {
+      transform: translateY(-5px);
     }
 
     .like-btn {
       background: #ff4d6d;
       border: none;
       padding: 8px 14px;
-      border-radius: 6px;
+      border-radius: 8px;
       color: white;
       cursor: pointer;
-      margin-top: 10px;
+      margin: 5px;
+    }
+
+    .share-btn {
+      background: #25D366;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
     }
 
     .footer {
-      margin-top: 50px;
+      margin-top: 40px;
       padding: 20px;
       font-size: 14px;
       color: #ccc;
@@ -98,6 +123,8 @@
   </select>
 </div>
 
+<p style="color:#ddd;">🔍 Search your name or quote to find your submission</p>
+
 <h2>🔥 Community Quotes</h2>
 
 <div id="quotes"></div>
@@ -117,7 +144,8 @@ fetch(SHEET_URL)
   .then(res => res.json())
   .then(data => {
     allQuotes = data;
-    displayQuotes(data);
+    const approved = data.filter(item => item["Status"] === "Approved");
+    displayQuotes(approved);
   });
 
 function displayQuotes(data) {
@@ -125,7 +153,7 @@ function displayQuotes(data) {
   container.innerHTML = "";
 
   if (data.length === 0) {
-    container.innerHTML = "<p>No quotes found. Be the first to share yours!</p>";
+    container.innerHTML = "<p>No approved quotes yet.</p>";
     return;
   }
 
@@ -140,6 +168,10 @@ function displayQuotes(data) {
     const rowNumber = index + 2;
     const alreadyLiked = localStorage.getItem("liked_" + rowNumber);
 
+    const shareText = encodeURIComponent(
+      `"${quote}" - ${name}\n\nSubmit yours 👉 https://thegreatquotewall.github.io/thegreatquotewall/`
+    );
+
     const div = document.createElement("div");
     div.className = "quote";
 
@@ -153,6 +185,10 @@ function displayQuotes(data) {
         ${alreadyLiked ? "disabled" : ""}>
         ${alreadyLiked ? "Liked ❤️" : "❤️ Like"}
       </button>
+
+      <a href="https://wa.me/?text=${shareText}" target="_blank">
+        <button class="share-btn">📲 Share</button>
+      </a>
 
       <p>${likes} Likes</p>
     `;
@@ -181,8 +217,10 @@ function filterQuotes() {
     const quote = (item["Enter your quote (max 25 words)"] || "").toLowerCase();
     const name = (item["Your Name"] || "").toLowerCase();
     const cat = item["Category"];
+    const status = item["Status"];
 
     return (
+      status === "Approved" &&
       (quote.includes(search) || name.includes(search)) &&
       (category === "All" || cat === category)
     );
