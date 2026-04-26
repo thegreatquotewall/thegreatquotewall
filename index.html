@@ -12,10 +12,7 @@
       text-align: center;
     }
 
-    h1 {
-      margin-top: 30px;
-      font-size: 28px;
-    }
+    h1 { margin-top: 30px; }
 
     .subtitle {
       color: #ddd;
@@ -33,10 +30,6 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
-    .submit-btn:hover {
-      transform: scale(1.05);
-    }
-
     .search-box {
       margin-top: 20px;
     }
@@ -46,7 +39,6 @@
       border-radius: 8px;
       border: none;
       margin: 5px;
-      outline: none;
     }
 
     #quotes {
@@ -54,19 +46,14 @@
     }
 
     .quote {
-      backdrop-filter: blur(10px);
       background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
       padding: 25px;
       margin: 20px auto;
       border-radius: 16px;
       width: 85%;
       max-width: 420px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      transition: transform 0.3s;
-    }
-
-    .quote:hover {
-      transform: translateY(-5px);
     }
 
     .like-btn {
@@ -89,10 +76,19 @@
       margin: 5px;
     }
 
+    .insta-btn {
+      background: #E1306C;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
+    }
+
     .footer {
       margin-top: 40px;
       padding: 20px;
-      font-size: 14px;
       color: #ccc;
     }
   </style>
@@ -152,16 +148,13 @@ function displayQuotes(data) {
   const container = document.getElementById("quotes");
   container.innerHTML = "";
 
-  if (data.length === 0) {
-    container.innerHTML = "<p>No approved quotes yet.</p>";
-    return;
-  }
-
   data.forEach((item, index) => {
+
     const quote = item["Enter your quote (max 25 words)"];
     const name = item["Your Name"];
     const category = item["Category"];
     const likes = item["Likes"] || 0;
+    const social = item["Social link (Instagram or Facebook)"];
 
     if (!quote) return;
 
@@ -178,7 +171,14 @@ function displayQuotes(data) {
     div.innerHTML = `
       <h3>"${quote}"</h3>
       <p>- ${name || "Anonymous"}</p>
-      <small>${category || "-"}</small><br><br>
+      <small>${category || "-"}</small><br>
+
+      ${social ? `
+      <a href="${social}" target="_blank">
+        <button class="insta-btn">📸 Instagram</button>
+      </a>` : ""}
+
+      <br>
 
       <button class="like-btn"
         onclick="likeQuote(${rowNumber}, this)"
