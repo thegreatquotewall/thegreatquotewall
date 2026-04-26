@@ -154,7 +154,15 @@ function displayQuotes(data) {
     const name = item["Your Name"];
     const category = item["Category"];
     const likes = item["Likes"] || 0;
-    const social = item["Social link (Instagram or Facebook)"];
+let social = item["Social link (Instagram or Facebook)"] || "";
+
+if (social && !social.startsWith("http")) {
+  social = "https://" + social;
+}
+
+if (social.includes("@")) {
+  social = "https://instagram.com/" + social.replace("@", "");
+}
 
     if (!quote) return;
 
